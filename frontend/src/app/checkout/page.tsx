@@ -49,6 +49,8 @@ export default function CheckoutPage() {
 
   // Payment State
   const [paymentMethod, setPaymentMethod] = useState("Card");
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   // Load Razorpay
   useEffect(() => {
@@ -117,6 +119,7 @@ export default function CheckoutPage() {
     }
 
     try {
+      setIsPlacingOrder(true);
       const config = { headers: { Authorization: `Bearer ${user.token}` } };
       const mappedOrderItems = cart.map(item => ({
         name: item.name,
@@ -163,9 +166,11 @@ export default function CheckoutPage() {
                 },
                 config
               );
-              alert("Payment successful!");
-              clearCart();
-              router.push("/profile");
+              setShowSuccessModal(true);
+              setTimeout(() => {
+                clearCart();
+                router.push("/profile");
+              }, 3000);
             } catch (err) {
               alert("Payment verification failed.");
             }
@@ -182,15 +187,19 @@ export default function CheckoutPage() {
           { orderId: orderData.orderId },
           config
         );
-        alert(`Order placed successfully using Cash on Delivery!`);
-        clearCart();
-        router.push("/profile");
+        setShowSuccessModal(true);
+        setTimeout(() => {
+          clearCart();
+          router.push("/profile");
+        }, 3000);
       } else {
          alert("Invalid payment method selected.");
       }
     } catch (error) {
       console.error(error);
       alert("Order failed.");
+    } finally {
+      setIsPlacingOrder(false);
     }
   };
 
@@ -409,13 +418,24 @@ export default function CheckoutPage() {
                          <div className="flex items-center space-x-2"><Tag className="w-4 h-4 opacity-70" /><span>Apply Coupon</span></div>
                          {couponOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                        </button>
-                       {couponOpen && (
+                       {couponOpen && !appliedCoupon && (
                          <div className="p-4 pt-0 flex space-x-2">
                            <input type="text" value={couponCodeInput} onChange={e => setCouponCodeInput(e.target.value.toUpperCase())} placeholder="Enter Code" className="flex-1 border border-border p-2 text-sm rounded focus:outline-none focus:border-teal-600" />
                            <button onClick={handleApplyCoupon} className="bg-teal-600 text-white px-4 text-sm font-bold rounded hover:bg-teal-700">Apply</button>
                          </div>
                        )}
-                       {couponError && <div className="px-4 pb-4 text-xs text-red-500">{couponError}</div>}
+                       {couponOpen && appliedCoupon && (
+                         <div className="p-4 pt-0 flex justify-between items-center bg-teal-50 border border-teal-200 mx-4 mb-4 rounded px-3 py-2">
+                           <div className="flex flex-col">
+                             <span className="text-sm font-bold text-teal-700">{appliedCoupon.code} Applied!</span>
+                             <span className="text-xs text-teal-600">You saved {appliedCoupon.discountPercentage}%</span>
+                           </div>
+                           <button onClick={() => setAppliedCoupon(null)} className="text-xs font-bold text-red-500 hover:underline uppercase tracking-widest">
+                             Remove
+                           </button>
+                         </div>
+                       )}
+                       {couponError && !appliedCoupon && <div className="px-4 pb-4 text-xs text-red-500">{couponError}</div>}
                     </div>
                     {/* Vouchers */}
                     <button className="w-full p-4 flex justify-between items-center text-sm font-bold hover:bg-muted/30 transition-colors">
@@ -450,8 +470,16 @@ export default function CheckoutPage() {
                     </button>
                   )}
                   {step === "PAYMENT" && (
-                    <button onClick={handlePlaceOrder} className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-4 text-sm tracking-wide transition-colors uppercase">
-                      Confirm Order
+                    <button disabled={isPlacingOrder} onClick={handlePlaceOrder} className={`w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-4 text-sm tracking-wide transition-colors uppercase flex justify-center items-center ${isPlacingOrder ? 'opacity-70 cursor-wait' : ''}`}>
+                      {isPlacingOrder ? (
+                        <>
+                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Processing...
+                        </>
+                      ) : "Confirm Order"}
                     </button>
                   )}
                 </div>
@@ -524,6 +552,37 @@ export default function CheckoutPage() {
           </div>
         </div>
       )}
+
+    {/* Success Modal */}
+      <AnimatePresence>
+        {showSuccessModal && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              className="bg-white rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl relative overflow-hidden"
+            >
+              <div className="absolute top-0 left-0 w-full h-2 bg-teal-500"></div>
+              <div className="w-20 h-20 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Check className="w-10 h-10 text-teal-600" />
+              </div>
+              <h2 className="text-2xl font-black uppercase tracking-tighter text-[#2d2d2d] mb-2">Order Confirmed!</h2>
+              <p className="text-muted-foreground text-sm mb-6">Thank you for your purchase. We are redirecting you to your orders...</p>
+              
+              <div className="flex justify-center items-center space-x-2 opacity-50">
+                <div className="w-2 h-2 bg-teal-600 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                <div className="w-2 h-2 bg-teal-600 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                <div className="w-2 h-2 bg-teal-600 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </div>
   );
