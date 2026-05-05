@@ -7,7 +7,7 @@ import { ChevronLeft, ChevronRight, RefreshCw, Truck, Wallet } from "lucide-reac
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://oursfit-backends.onrender.com/api';
 
 import { getImageUrl } from "@/utils/getImageUrl";
 
@@ -60,8 +60,8 @@ export default function Home() {
                 />
               </div>
               <div className="relative z-10 text-center">
-                <h2 className="text-6xl md:text-8xl font-black uppercase tracking-tighter text-black">T-SHIRTS</h2>
-                <p className="text-xl font-bold tracking-widest mt-2 uppercase">Oversized | Relaxed | Fitted</p>
+                <h2 className="text-6xl md:text-8xl font-black uppercase tracking-tighter text-white drop-shadow-lg">NEW COLLECTION</h2>
+                <p className="text-xl font-bold tracking-widest mt-2 uppercase text-white drop-shadow-md">Premium | Minimal | Streetwear</p>
               </div>
            </div>
         </div>
@@ -108,9 +108,9 @@ export default function Home() {
       </section>
 
       {/* New Arrivals Section */}
-      <section className="py-16">
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-extrabold uppercase tracking-widest text-center mb-12 text-[#2d2d2d]">New Arrivals</h2>
+          <h2 className="text-4xl font-black uppercase tracking-tighter text-center mb-16 text-[#111]">New Arrivals</h2>
           
           <div className="relative">
             <div className="flex space-x-4 overflow-x-auto pb-8 snap-x scrollbar-hide">
@@ -155,11 +155,11 @@ export default function Home() {
       </section>
 
       {/* Categories Section */}
-      <section className="py-16 bg-white">
+      <section className="py-20 bg-[#f9f9f9]">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-extrabold uppercase tracking-widest text-center mb-12 text-[#2d2d2d]">Categories</h2>
+          <h2 className="text-4xl font-black uppercase tracking-tighter text-center mb-16 text-[#111]">Shop by Category</h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {categories.map((category) => (
               <div key={category.id} className="text-center group cursor-pointer">
                 <Link href={`/shop?category=${category.name.toLowerCase()}`}>

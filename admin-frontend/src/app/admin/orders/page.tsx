@@ -46,24 +46,86 @@ export default function AdminOrders() {
     }
   }, [fetchOrders, user]);
 
-  const updateOrderStatus = async (id: string, currentStatus: string) => {
+  const updateOrderStatus = async (id: string, newStatus: string) => {
     try {
       const config = { headers: { Authorization: `Bearer ${user?.token}` } };
-      
-      let endpoint = '';
-      if (currentStatus === 'pending') {
-        // Technically we need backend routes for processing and shipped.
-        // For now, let's just use deliver endpoint and we will modify backend to handle generic status update.
-        // Actually, backend has only /deliver which sets isDelivered=true and status='delivered'.
-        // Let's call /deliver for now or we need to add a generic update status route.
-      }
-
-      await axios.put(`${API_URL}/orders/${id}/deliver`, {}, config);
+      await axios.put(`${API_URL}/orders/${id}/status`, { status: newStatus }, config);
       fetchOrders();
     } catch (error) {
       console.error("Error updating order", error);
       alert("Failed to update order status.");
     }
+  };
+
+  const handlePrintLabel = (order: any) => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+    
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Shipping Label - Order #${order._id}</title>
+          <style>
+            body { font-family: sans-serif; padding: 40px; margin: 0; }
+            .label { border: 2px solid #000; padding: 20px; max-width: 600px; margin: 0 auto; }
+            .header { border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 20px; display: flex; justify-content: space-between; }
+            .title { font-size: 24px; font-weight: 900; letter-spacing: -1px; margin: 0; }
+            .order-id { font-size: 14px; font-weight: bold; }
+            .section-title { font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; color: #666; margin-bottom: 10px; }
+            .address { font-size: 16px; line-height: 1.5; margin-bottom: 30px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ccc; font-size: 14px; }
+            th { text-transform: uppercase; font-size: 12px; }
+            .footer { margin-top: 40px; text-align: center; font-size: 12px; color: #666; }
+          </style>
+        </head>
+        <body>
+          <div class="label">
+            <div class="header">
+              <h1 class="title">OURSFIT</h1>
+              <div class="order-id">Order #${order._id.substring(0, 8)}</div>
+            </div>
+            
+            <div class="section-title">Ship To</div>
+            <div class="address">
+              <strong>${order.shippingAddress?.fullName || order.user?.name || "Customer"}</strong><br>
+              ${order.shippingAddress?.address || order.shippingAddress?.street}<br>
+              ${order.shippingAddress?.city}, ${order.shippingAddress?.state} ${order.shippingAddress?.postalCode}<br>
+              ${order.shippingAddress?.country}<br>
+              ${order.shippingAddress?.phone ? `Phone: ${order.shippingAddress.phone}` : ''}
+            </div>
+
+            <div class="section-title">Order Summary</div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Size</th>
+                  <th>Qty</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${order.orderItems?.map((item: any) => `
+                  <tr>
+                    <td><strong>${item.name}</strong></td>
+                    <td>${item.size}</td>
+                    <td>${item.qty}</td>
+                  </tr>
+                `).join('') || ''}
+              </tbody>
+            </table>
+            
+            <div class="footer">
+              If undelivered, return to: OURSFIT, 123 Streetwear Ave, Mumbai, MH 400001
+            </div>
+          </div>
+          <script>
+            window.onload = function() { window.print(); }
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
   };
 
   return (
@@ -138,22 +200,27 @@ export default function AdminOrders() {
                     </div>
                   </td>
                   <td className="p-4">
-                    <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full w-max
-                      ${order.status === 'delivered' ? 'bg-green-500/20 text-green-600' : 
-                        order.status === 'pending' ? 'bg-yellow-500/20 text-yellow-600' : 
-                        'bg-blue-500/20 text-blue-600'}`}
+                    <select
+                      value={order.status || 'pending'}
+                      onChange={(e) => updateOrderStatus(order._id, e.target.value)}
+                      className="bg-transparent border border-border text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded outline-none"
                     >
-                      {order.status || 'Pending'}
-                    </span>
+                      <option value="pending">Pending</option>
+                      <option value="confirmed">Confirmed</option>
+                      <option value="processing">Processing</option>
+                      <option value="shipped">Shipped</option>
+                      <option value="out for delivery">Out for Delivery</option>
+                      <option value="delivered">Delivered</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
                   </td>
                   <td className="p-4 text-right flex justify-end space-x-2 items-center">
-                    {order.status !== 'delivered' && (
+                    {(order.status === 'shipped' || order.status === 'out for delivery') && (
                       <button 
-                        onClick={() => updateOrderStatus(order._id, order.status)}
-                        className="flex items-center space-x-1 px-3 py-1 bg-green-500 hover:bg-green-600 text-white transition-colors rounded text-xs font-bold uppercase tracking-widest"
+                        onClick={() => handlePrintLabel(order)}
+                        className="flex items-center px-3 py-1 bg-black hover:bg-gray-800 text-white transition-colors rounded text-xs font-bold uppercase tracking-widest"
                       >
-                        <CheckCircle className="w-3 h-3" />
-                        <span>Confirm Delivery</span>
+                        Print Label
                       </button>
                     )}
                     <button onClick={() => setSelectedOrder(order)} className="text-xs font-bold uppercase tracking-widest underline underline-offset-4 hover:opacity-70 transition-opacity ml-4">

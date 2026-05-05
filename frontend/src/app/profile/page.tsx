@@ -5,7 +5,7 @@ import { useStore } from "@/store/useStore";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { Package, User, LogOut, MapPin, Gift, HelpCircle, Shield, Trash2, CreditCard, Coins } from "lucide-react";
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://oursfit-backends.onrender.com/api';
 
 export default function ProfilePage() {
   const { user, setUser } = useStore();
@@ -153,7 +153,7 @@ export default function ProfilePage() {
                         </div>
                         <div className="mt-4 md:mt-0 text-left md:text-right">
                           <p className="font-bold text-lg mb-2">₹ {order.totalPrice.toFixed(2)}</p>
-                          <button onClick={() => alert(`Order details coming soon! Order ID: ${order._id}`)} className="text-xs font-bold uppercase tracking-widest underline underline-offset-4 hover:text-teal-600 transition-colors">
+                          <button onClick={() => router.push(`/orders/${order._id}`)} className="text-xs font-bold uppercase tracking-widest underline underline-offset-4 hover:text-teal-600 transition-colors">
                             View Details
                           </button>
                         </div>

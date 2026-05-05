@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import axios from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://oursfit-backend.onrender.com/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://oursfit-backends.onrender.com/api';
 
 interface User {
   _id: string;
@@ -39,6 +39,7 @@ interface StoreState {
   setWishlist: (wishlist: string[]) => void;
   setAddresses: (addresses: any[]) => void;
   setAppliedCoupon: (coupon: { code: string; discountPercentage: number } | null) => void;
+  toggleWishlist: (productId: string) => Promise<void>;
 }
 
 export const useStore = create<StoreState>()(
@@ -137,6 +138,30 @@ export const useStore = create<StoreState>()(
          }
       },
       setWishlist: (wishlist) => set({ wishlist }),
+      toggleWishlist: async (productId) => {
+        const user = get().user;
+        const currentWishlist = get().wishlist;
+        const isWished = currentWishlist.includes(productId);
+        
+        // Optimistic UI update
+        const newWishlist = isWished 
+          ? currentWishlist.filter(id => id !== productId)
+          : [...currentWishlist, productId];
+        
+        set({ wishlist: newWishlist });
+
+        if (user && user.token) {
+          try {
+            await axios.post(`${API_URL}/auth/wishlist`, { productId }, {
+              headers: { Authorization: `Bearer ${user.token}` }
+            });
+          } catch (error) {
+            console.error("Failed to sync wishlist", error);
+            // Revert optimistic update
+            set({ wishlist: currentWishlist });
+          }
+        }
+      },
       setAddresses: (addresses) => set({ addresses }),
       setAppliedCoupon: (appliedCoupon) => set({ appliedCoupon }),
     }),

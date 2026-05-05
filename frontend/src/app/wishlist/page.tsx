@@ -8,10 +8,10 @@ import { useStore } from "@/store/useStore";
 import { getImageUrl } from "@/utils/getImageUrl";
 import { motion } from "framer-motion";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://oursfit-backend.onrender.com/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://oursfit-backends.onrender.com/api';
 
 export default function WishlistPage() {
-  const { user, wishlist, setWishlist, addToCart } = useStore();
+  const { user, wishlist, setWishlist, addToCart, toggleWishlist } = useStore();
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -39,13 +39,7 @@ export default function WishlistPage() {
 
   const handleRemoveFromWishlist = async (productId: string) => {
     if (!user?.token) return;
-    try {
-      const config = { headers: { Authorization: `Bearer ${user.token}` } };
-      const { data } = await axios.post(`${API_URL}/auth/wishlist`, { productId }, config);
-      setWishlist(data.wishlist);
-    } catch (error) {
-      console.error("Failed to remove from wishlist", error);
-    }
+    await toggleWishlist(productId);
   };
 
   const handleMoveToCart = (product: any) => {
@@ -68,9 +62,9 @@ export default function WishlistPage() {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-4">
         <Heart className="w-16 h-16 opacity-20" />
-        <h2 className="text-2xl font-bold uppercase tracking-widest text-[#2d2d2d]">Please Login</h2>
+        <h2 className="text-2xl font-black uppercase tracking-tighter text-[#111]">Please Login</h2>
         <p className="text-sm opacity-70">Log in to view your wishlist.</p>
-        <Link href="/auth/login" className="bg-teal-600 text-white px-8 py-3 font-bold uppercase tracking-widest text-sm hover:bg-teal-700 transition-colors">
+        <Link href="/auth/login" className="bg-[#111] text-white px-8 py-3 font-bold uppercase tracking-widest text-sm hover:bg-black transition-colors">
           Login Now
         </Link>
       </div>
@@ -123,11 +117,11 @@ export default function WishlistPage() {
                   <h3 className="font-bold uppercase tracking-wider text-sm mb-1 line-clamp-1">{product.name}</h3>
                 </Link>
                 <div className="flex justify-between items-center mt-2">
-                  <p className="text-sm font-bold">₹ {product.price}</p>
+                  <p className="text-sm font-black text-[#111]">₹ {product.price}</p>
                 </div>
                 <button 
                   onClick={() => handleMoveToCart(product)}
-                  className="w-full mt-4 border border-teal-600 text-teal-600 font-bold py-2 text-xs uppercase tracking-widest hover:bg-teal-50 transition-colors"
+                  className="w-full mt-4 bg-black text-white font-bold py-3 text-xs uppercase tracking-widest hover:opacity-80 transition-opacity"
                 >
                   Move to Cart
                 </button>

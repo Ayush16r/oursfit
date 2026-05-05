@@ -8,7 +8,7 @@ import { Heart, Share2, ChevronDown, ChevronUp } from "lucide-react";
 import { useStore } from "@/store/useStore";
 import axios from "axios";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://oursfit-backends.onrender.com/api';
 
 import { getImageUrl } from "@/utils/getImageUrl";
 
@@ -31,7 +31,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   const [pincode, setPincode] = useState("");
   const [pincodeStatus, setPincodeStatus] = useState<{deliverable?: boolean, days?: number, checking?: boolean, error?: string} | null>(null);
 
-  const { user, cart, addToCart, wishlist, setWishlist } = useStore();
+  const { user, cart, addToCart, wishlist, toggleWishlist } = useStore();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -86,14 +86,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
       router.push("/auth/login");
       return;
     }
-
-    try {
-      const config = { headers: { Authorization: `Bearer ${user.token}` } };
-      const { data } = await axios.post(`${API_URL}/auth/wishlist`, { productId: product._id }, config);
-      setWishlist(data.wishlist);
-    } catch (error) {
-      console.error("Failed to toggle wishlist", error);
-    }
+    await toggleWishlist(product._id);
   };
 
   const checkPincode = async () => {

@@ -5,10 +5,20 @@ import { ShoppingBag, User, Search, Menu, Heart } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStore } from "@/store/useStore";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const cart = useStore((state) => state.cart);
+  const router = useRouter();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-border">
@@ -28,42 +38,38 @@ export default function Header() {
             <Link href="/shop?category=men" className="text-sm font-bold uppercase tracking-wider hover:text-accent border-b-2 border-transparent hover:border-accent transition-all pb-1">
               MEN
             </Link>
-            <Link href="/shop?category=women" className="text-sm font-bold uppercase tracking-wider hover:text-accent border-b-2 border-transparent hover:border-accent transition-all pb-1">
-              WOMEN
-            </Link>
-            <Link href="/shop?category=sneakers" className="text-sm font-bold uppercase tracking-wider hover:text-accent border-b-2 border-transparent hover:border-accent transition-all pb-1">
-              SNEAKERS
+            <Link href="/shop" className="text-sm font-bold uppercase tracking-wider hover:text-accent border-b-2 border-transparent hover:border-accent transition-all pb-1">
+              ALL PRODUCTS
             </Link>
           </nav>
         </div>
 
         {/* Logo */}
-        <Link href="/" className="text-2xl font-extrabold tracking-tighter text-accent flex-shrink-0 absolute left-1/2 -translate-x-1/2">
-          <span className="flex items-center">
-            <span className="flex flex-col leading-none">
-              <span>Ours</span>
-              <span>Fit</span>
-            </span>
-          </span>
+        <Link href="/" className="text-3xl font-black uppercase tracking-tighter text-[#111] flex-shrink-0 absolute left-1/2 -translate-x-1/2 hover:scale-105 transition-transform">
+          OURSFIT
         </Link>
 
         {/* Right Icons & Search */}
         <div className="flex items-center space-x-4">
-          <div className="hidden lg:flex items-center bg-muted rounded-full px-4 py-1.5 w-64">
+          <form onSubmit={handleSearch} className="hidden lg:flex items-center bg-muted rounded-full px-4 py-1.5 w-64 border border-transparent focus-within:border-accent transition-colors">
             <input 
               type="text" 
               placeholder="What are you looking for?" 
               className="bg-transparent border-none outline-none w-full text-sm placeholder:text-gray-500"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <Search className="w-4 h-4 text-gray-500 ml-2" />
-          </div>
+            <button type="submit">
+              <Search className="w-4 h-4 text-gray-500 ml-2 hover:text-accent transition-colors" />
+            </button>
+          </form>
           
           <Link href="/profile" className="p-2 hover:bg-muted rounded-full transition-colors">
             <User className="w-5 h-5" />
           </Link>
-          <button className="p-2 hover:bg-muted rounded-full transition-colors hidden sm:block">
+          <Link href="/wishlist" className="p-2 hover:bg-muted rounded-full transition-colors hidden sm:block">
             <Heart className="w-5 h-5" />
-          </button>
+          </Link>
           <Link href="/cart" className="p-2 hover:bg-muted rounded-full transition-colors relative">
             <ShoppingBag className="w-5 h-5" />
             {cart.length > 0 && (
@@ -88,11 +94,8 @@ export default function Header() {
               <Link href="/shop?category=men" className="text-xl font-bold uppercase tracking-wider" onClick={() => setIsMenuOpen(false)}>
                 MEN
               </Link>
-              <Link href="/shop?category=women" className="text-xl font-bold uppercase tracking-wider" onClick={() => setIsMenuOpen(false)}>
-                WOMEN
-              </Link>
-              <Link href="/shop?category=sneakers" className="text-xl font-bold uppercase tracking-wider" onClick={() => setIsMenuOpen(false)}>
-                SNEAKERS
+              <Link href="/shop" className="text-xl font-bold uppercase tracking-wider" onClick={() => setIsMenuOpen(false)}>
+                ALL PRODUCTS
               </Link>
             </nav>
           </motion.div>

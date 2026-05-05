@@ -4,12 +4,15 @@ import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import axios from "axios";
+import { useSearchParams } from "next/navigation";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://oursfit-backends.onrender.com/api';
 
 import { getImageUrl } from "@/utils/getImageUrl";
 
 export default function ShopPage() {
+  const searchParams = useSearchParams();
+  const searchFilter = searchParams.get('search')?.toLowerCase() || "";
   const [activeCategory, setActiveCategory] = useState("All");
   const [products, setProducts] = useState<any[]>([]);
 
@@ -30,9 +33,11 @@ export default function ShopPage() {
      return ["All", ...Array.from(cats)];
   }, [products]);
 
-  const filteredProducts = activeCategory === "All" 
-    ? products 
-    : products.filter(p => p.category === activeCategory);
+  const filteredProducts = products.filter(p => {
+    const matchesCategory = activeCategory === "All" || p.category === activeCategory;
+    const matchesSearch = !searchFilter || p.name.toLowerCase().includes(searchFilter) || p.category?.toLowerCase().includes(searchFilter);
+    return matchesCategory && matchesSearch;
+  });
 
   return (
     <div className="container mx-auto px-4 py-12 min-h-screen">

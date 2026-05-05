@@ -10,8 +10,9 @@ import axios from "axios";
 import { useStore } from "@/store/useStore";
 import Script from "next/script";
 import { getImageUrl } from "@/utils/getImageUrl";
+import PaymentSuccessModal from "@/components/PaymentSuccessModal";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://oursfit-backends.onrender.com/api';
 const RAZORPAY_KEY = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_SkPHLgVLe7WUIn';
 
 export default function CheckoutPage() {
@@ -51,6 +52,7 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState("Card");
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [placedOrderId, setPlacedOrderId] = useState("");
 
   // Load Razorpay
   useEffect(() => {
@@ -166,11 +168,9 @@ export default function CheckoutPage() {
                 },
                 config
               );
+              setPlacedOrderId(orderData.orderId);
               setShowSuccessModal(true);
-              setTimeout(() => {
-                clearCart();
-                router.push("/profile");
-              }, 3000);
+              clearCart();
             } catch (err) {
               alert("Payment verification failed.");
             }
@@ -187,11 +187,9 @@ export default function CheckoutPage() {
           { orderId: orderData.orderId },
           config
         );
+        setPlacedOrderId(orderData.orderId);
         setShowSuccessModal(true);
-        setTimeout(() => {
-          clearCart();
-          router.push("/profile");
-        }, 3000);
+        clearCart();
       } else {
          alert("Invalid payment method selected.");
       }
@@ -554,35 +552,7 @@ export default function CheckoutPage() {
       )}
 
     {/* Success Modal */}
-      <AnimatePresence>
-        {showSuccessModal && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm"
-          >
-            <motion.div 
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              className="bg-white rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl relative overflow-hidden"
-            >
-              <div className="absolute top-0 left-0 w-full h-2 bg-teal-500"></div>
-              <div className="w-20 h-20 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Check className="w-10 h-10 text-teal-600" />
-              </div>
-              <h2 className="text-2xl font-black uppercase tracking-tighter text-[#2d2d2d] mb-2">Order Confirmed!</h2>
-              <p className="text-muted-foreground text-sm mb-6">Thank you for your purchase. We are redirecting you to your orders...</p>
-              
-              <div className="flex justify-center items-center space-x-2 opacity-50">
-                <div className="w-2 h-2 bg-teal-600 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                <div className="w-2 h-2 bg-teal-600 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                <div className="w-2 h-2 bg-teal-600 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <PaymentSuccessModal isOpen={showSuccessModal} orderId={placedOrderId} />
 
     </div>
   );
