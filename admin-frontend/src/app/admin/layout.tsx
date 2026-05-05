@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Package, ShoppingCart, Users, Settings, LogOut, Bell, Ticket, MapPin } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingCart, Users, Settings, LogOut, Bell, Ticket, MapPin, Percent } from "lucide-react";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useStore } from "@/store/useStore";
@@ -71,6 +71,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: "Orders", href: "/admin/orders", icon: ShoppingCart, badge: unreadCount },
     { name: "Users", href: "/admin/users", icon: Users },
     { name: "Coupons", href: "/admin/coupons", icon: Ticket },
+    { name: "Marketing & Delivery", href: "/admin/marketing", icon: Percent },
     { name: "Pincodes", href: "/admin/pincodes", icon: MapPin },
     { name: "Settings", href: "/admin/settings", icon: Settings },
   ];

@@ -18,6 +18,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
   
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [deliveryDays, setDeliveryDays] = useState(5); // fallback
 
   useEffect(() => {
     if (!user?.token) {
@@ -32,12 +33,21 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
         setOrder(data);
       } catch (error) {
         console.error("Failed to fetch order details", error);
-      } finally {
-        setLoading(false);
       }
     };
 
-    fetchOrderDetails();
+    const fetchSettings = async () => {
+      try {
+        const { data } = await axios.get(`${API_URL}/settings`);
+        if (data && data.deliveryDays) setDeliveryDays(data.deliveryDays);
+      } catch (error) {
+        console.error("Failed to fetch settings", error);
+      }
+    };
+
+    Promise.all([fetchOrderDetails(), fetchSettings()]).finally(() => {
+      setLoading(false);
+    });
   }, [orderId, user, router]);
 
   if (loading) {
@@ -48,9 +58,9 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
     return <div className="min-h-screen flex items-center justify-center font-bold uppercase tracking-widest opacity-50">Order not found</div>;
   }
 
-  // Calculate expected delivery date (+5 days from createdAt or shipped date)
+  // Calculate expected delivery date (+ deliveryDays from createdAt)
   const deliveryDate = new Date(order.createdAt);
-  deliveryDate.setDate(deliveryDate.getDate() + 5);
+  deliveryDate.setDate(deliveryDate.getDate() + deliveryDays);
 
   const steps = [
     { label: "Order Placed", status: "Pending", icon: Clock },

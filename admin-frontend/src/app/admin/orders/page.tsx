@@ -14,6 +14,7 @@ export default function AdminOrders() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const { user } = useStore();
 
   const fetchOrders = useCallback(async (isSilentRefresh = false) => {
@@ -128,6 +129,16 @@ export default function AdminOrders() {
     printWindow.document.close();
   };
 
+  const filteredOrders = orders.filter((order: any) => {
+    if (!searchQuery) return true;
+    const lowerQuery = searchQuery.toLowerCase();
+    return (
+      order._id.toLowerCase().includes(lowerQuery) ||
+      (order.user?.name || "").toLowerCase().includes(lowerQuery) ||
+      (order.user?.email || "").toLowerCase().includes(lowerQuery)
+    );
+  });
+
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-end">
@@ -145,7 +156,13 @@ export default function AdminOrders() {
           </button>
           <div className="relative hidden md:block">
             <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 opacity-50" />
-            <input type="text" placeholder="Search orders..." className="pl-10 pr-4 py-2 bg-transparent border border-border text-sm focus:outline-none focus:border-foreground" />
+            <input 
+              type="text" 
+              placeholder="Search orders..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 pr-4 py-2 bg-transparent border border-border text-sm focus:outline-none focus:border-foreground" 
+            />
           </div>
           <button className="btn-outline flex items-center space-x-2 py-2 px-4 text-sm hidden md:flex">
             <Filter className="w-4 h-4" />
@@ -173,11 +190,11 @@ export default function AdminOrders() {
                 <tr>
                   <td colSpan={7} className="p-4 text-center opacity-50">Loading orders...</td>
                 </tr>
-              ) : orders.length === 0 ? (
+              ) : filteredOrders.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="p-4 text-center opacity-50">No orders found.</td>
                 </tr>
-              ) : orders.map((order: any) => (
+              ) : filteredOrders.map((order: any) => (
                 <tr key={order._id} className="hover:bg-muted/30 transition-colors">
                   <td className="p-4 font-bold text-sm">#{order._id.substring(0, 8)}</td>
                   <td className="p-4 text-sm opacity-70">{new Date(order.createdAt).toLocaleDateString()}</td>

@@ -6,10 +6,12 @@ const {
   createProduct,
   updateProduct,
   deleteProduct,
+  applyGlobalSale,
 } = require('../controllers/productController');
 const { protect, admin } = require('../middleware/authMiddleware');
 
 router.route('/').get(getProducts).post(protect, admin, createProduct);
+router.route('/sale').post(protect, admin, applyGlobalSale);
 router
   .route('/:id')
   .get(getProductById)

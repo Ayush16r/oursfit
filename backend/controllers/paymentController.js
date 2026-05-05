@@ -116,26 +116,23 @@ const verifyPayment = async (req, res) => {
 
       // Send Email to User using Nodemailer
       const sendEmail = require('../utils/sendEmail');
-      try {
-        await sendEmail({
-          email: req.user.email,
-          subject: `OursFit Order Confirmed - #${updatedOrder._id.toString().substring(0, 8)}`,
-          message: `Hello ${req.user.name},\n\nYour payment was successful and your order for ₹${updatedOrder.totalPrice.toFixed(2)} has been confirmed!\n\nThank you for shopping with OursFit.`,
-          html: `
-            <div style="font-family: sans-serif; padding: 20px;">
-              <h2 style="color: #e50914; text-transform: uppercase;">OursFit</h2>
-              <h3>Order Confirmed! 🎉</h3>
-              <p>Hello <strong>${req.user.name}</strong>,</p>
-              <p>We've received your order and payment of <strong>₹${updatedOrder.totalPrice.toFixed(2)}</strong>.</p>
-              <p>Order ID: #${updatedOrder._id.toString().substring(0, 8)}</p>
-              <p>Your items will be shipped soon. Thank you for shopping with us!</p>
-            </div>
-          `
-        });
-      } catch (emailError) {
+      sendEmail({
+        email: req.user.email,
+        subject: `OursFit Order Confirmed - #${updatedOrder._id.toString().substring(0, 8)}`,
+        message: `Hello ${req.user.name},\n\nYour payment was successful and your order for ₹${updatedOrder.totalPrice.toFixed(2)} has been confirmed!\n\nThank you for shopping with OursFit.`,
+        html: `
+          <div style="font-family: sans-serif; padding: 20px;">
+            <h2 style="color: #e50914; text-transform: uppercase;">OursFit</h2>
+            <h3>Order Confirmed! 🎉</h3>
+            <p>Hello <strong>${req.user.name}</strong>,</p>
+            <p>We've received your order and payment of <strong>₹${updatedOrder.totalPrice.toFixed(2)}</strong>.</p>
+            <p>Order ID: #${updatedOrder._id.toString().substring(0, 8)}</p>
+            <p>Your items will be shipped soon. Thank you for shopping with us!</p>
+          </div>
+        `
+      }).catch(emailError => {
         console.error('Error sending confirmation email:', emailError);
-        // We don't fail the order if the email fails, just log it
-      }
+      });
 
       return res.status(200).json({ message: "Payment verified successfully", order: updatedOrder });
     } else {
@@ -179,25 +176,23 @@ const confirmCOD = async (req, res) => {
 
     // Send Email to User using Nodemailer
     const sendEmail = require('../utils/sendEmail');
-    try {
-      await sendEmail({
-        email: req.user.email,
-        subject: `OursFit Order Confirmed - #${updatedOrder._id.toString().substring(0, 8)}`,
-        message: `Hello ${req.user.name},\n\nYour COD order for ₹${updatedOrder.totalPrice.toFixed(2)} has been confirmed!\n\nThank you for shopping with OursFit.`,
-        html: `
-          <div style="font-family: sans-serif; padding: 20px;">
-            <h2 style="color: #e50914; text-transform: uppercase;">OursFit</h2>
-            <h3>Order Confirmed! 🎉</h3>
-            <p>Hello <strong>${req.user.name}</strong>,</p>
-            <p>We've received your Cash on Delivery (COD) order of <strong>₹${updatedOrder.totalPrice.toFixed(2)}</strong>.</p>
-            <p>Order ID: #${updatedOrder._id.toString().substring(0, 8)}</p>
-            <p>Your items will be shipped soon. You can pay via cash or UPI at the time of delivery.</p>
-          </div>
-        `
-      });
-    } catch (emailError) {
+    sendEmail({
+      email: req.user.email,
+      subject: `OursFit Order Confirmed - #${updatedOrder._id.toString().substring(0, 8)}`,
+      message: `Hello ${req.user.name},\n\nYour COD order for ₹${updatedOrder.totalPrice.toFixed(2)} has been confirmed!\n\nThank you for shopping with OursFit.`,
+      html: `
+        <div style="font-family: sans-serif; padding: 20px;">
+          <h2 style="color: #e50914; text-transform: uppercase;">OursFit</h2>
+          <h3>Order Confirmed! 🎉</h3>
+          <p>Hello <strong>${req.user.name}</strong>,</p>
+          <p>We've received your Cash on Delivery (COD) order of <strong>₹${updatedOrder.totalPrice.toFixed(2)}</strong>.</p>
+          <p>Order ID: #${updatedOrder._id.toString().substring(0, 8)}</p>
+          <p>Your items will be shipped soon. You can pay via cash or UPI at the time of delivery.</p>
+        </div>
+      `
+    }).catch(emailError => {
       console.error('Error sending confirmation email:', emailError);
-    }
+    });
 
     return res.status(200).json({ message: "COD Order confirmed successfully", order: updatedOrder });
   } catch (error) {

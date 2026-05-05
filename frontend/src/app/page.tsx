@@ -135,7 +135,12 @@ export default function Home() {
                     <div>
                       <h3 className="font-bold text-sm text-[#2d2d2d] truncate">{product.name}</h3>
                       <p className="text-xs text-gray-500 mb-2">{product.category}</p>
-                      <p className="font-bold text-sm text-[#2d2d2d]">₹ {product.price}</p>
+                      <div className="flex space-x-2 items-center mt-1">
+                        <p className="font-bold text-sm text-[#2d2d2d]">₹ {product.price}</p>
+                        {product.originalPrice && product.originalPrice > product.price && (
+                          <p className="text-[10px] line-through opacity-50 font-bold">₹ {product.originalPrice}</p>
+                        )}
+                      </div>
                     </div>
                   </Link>
                 </div>

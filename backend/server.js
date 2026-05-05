@@ -12,6 +12,7 @@ const cartRoutes = require('./routes/cartRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const couponRoutes = require('./routes/couponRoutes');
 const pincodeRoutes = require('./routes/pincodeRoutes');
+const settingsRoutes = require('./routes/settingsRoutes');
 const path = require('path');
 
 // Connect to Database
@@ -36,6 +37,7 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/coupons', couponRoutes);
 app.use('/api/pincodes', pincodeRoutes);
+app.use('/api/settings', settingsRoutes);
 
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 

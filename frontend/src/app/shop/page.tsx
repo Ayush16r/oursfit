@@ -90,7 +90,12 @@ function ShopContent() {
                   <h3 className="font-bold uppercase tracking-wider text-sm mb-1">{product.name}</h3>
                   <p className="text-xs opacity-50 uppercase tracking-widest">{product.category}</p>
                 </div>
-                <p className="text-sm font-bold">₹ {product.price}</p>
+                <div className="text-right">
+                  <p className="text-sm font-bold">₹ {product.price}</p>
+                  {product.originalPrice && product.originalPrice > product.price && (
+                    <p className="text-[10px] line-through opacity-50 font-bold">₹ {product.originalPrice}</p>
+                  )}
+                </div>
               </div>
             </Link>
           </motion.div>

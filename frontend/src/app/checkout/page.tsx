@@ -289,27 +289,29 @@ export default function CheckoutPage() {
 
                     <div className="divide-y divide-border">
                       {cart.map((item) => (
-                        <div key={`${item.id}-${item.size}`} className="p-4 flex gap-4">
-                          <input type="checkbox" defaultChecked className="mt-2 accent-teal-600 w-4 h-4" />
-                          <div className="w-24 aspect-[3/4] relative bg-muted rounded shrink-0">
+                        <div key={`${item.id}-${item.size}`} className="p-4 flex gap-3 md:gap-4 relative">
+                          <div className="hidden sm:block">
+                            <input type="checkbox" defaultChecked className="mt-2 accent-teal-600 w-4 h-4" />
+                          </div>
+                          <div className="w-20 md:w-24 aspect-[3/4] relative bg-muted rounded shrink-0">
                             <Image src={getImageUrl(item.image)} alt={item.name} fill className="object-cover rounded" />
                           </div>
-                          <div className="flex-1">
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <h3 className="font-bold text-sm text-foreground">{item.name}</h3>
-                                <p className="text-xs text-muted-foreground mb-3">Oversized T-Shirts</p>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-2">
+                              <div className="truncate pr-2">
+                                <h3 className="font-bold text-sm text-foreground truncate">{item.name}</h3>
+                                <p className="text-xs text-muted-foreground mb-3 truncate">Oversized T-Shirts</p>
                                 
-                                <div className="flex space-x-4">
+                                <div className="flex space-x-2 md:space-x-4">
                                   <select 
-                                    className="border border-border text-xs py-1 px-2 rounded bg-background"
+                                    className="border border-border text-xs py-1 px-1 md:px-2 rounded bg-background"
                                     value={item.size}
                                     disabled
                                   >
                                     <option>Size: {item.size}</option>
                                   </select>
                                   <select 
-                                    className="border border-border text-xs py-1 px-2 rounded bg-background"
+                                    className="border border-border text-xs py-1 px-1 md:px-2 rounded bg-background"
                                     value={item.quantity}
                                     onChange={(e) => updateQuantity(item.id, item.size, Number(e.target.value))}
                                   >
@@ -317,8 +319,11 @@ export default function CheckoutPage() {
                                   </select>
                                 </div>
                               </div>
-                              <div className="text-right">
-                                <div className="font-bold text-sm">₹ {item.price} <span className="line-through text-xs text-muted-foreground ml-1">₹ {item.price + 100}</span></div>
+                              <div className="sm:text-right shrink-0 mt-2 sm:mt-0">
+                                <div className="font-bold text-sm">
+                                  ₹ {item.price} 
+                                  <span className="line-through text-[10px] text-muted-foreground ml-1">₹ {item.price + 100}</span>
+                                </div>
                                 <div className="text-[10px] text-muted-foreground mt-0.5">MRP incl. of all taxes</div>
                                 {user?.isMember && <div className="text-[10px] text-[#F14633] mt-0.5 font-bold">Member Savings: ₹ 100</div>}
                               </div>
@@ -328,9 +333,9 @@ export default function CheckoutPage() {
                       ))}
                     </div>
 
-                    <div className="p-4 flex justify-end space-x-4 border-t border-border">
-                      <button onClick={() => removeFromCart(cart[0].id, cart[0].size)} className="px-6 py-2 border border-border text-xs font-bold uppercase tracking-wider rounded hover:bg-muted transition-colors">Remove</button>
-                      <button onClick={() => { handleToggleWishlist(cart[0].id); removeFromCart(cart[0].id, cart[0].size); }} className="px-6 py-2 border border-border text-xs font-bold uppercase tracking-wider rounded hover:bg-muted transition-colors">Move To Wishlist</button>
+                    <div className="p-4 flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4 border-t border-border">
+                      <button onClick={() => removeFromCart(cart[0].id, cart[0].size)} className="px-6 py-3 sm:py-2 border border-border text-xs font-bold uppercase tracking-wider rounded hover:bg-muted transition-colors text-center">Remove</button>
+                      <button onClick={() => { handleToggleWishlist(cart[0].id); removeFromCart(cart[0].id, cart[0].size); }} className="px-6 py-3 sm:py-2 border border-border text-xs font-bold uppercase tracking-wider rounded hover:bg-muted transition-colors text-center">Move To Wishlist</button>
                     </div>
                   </div>
                 </>
