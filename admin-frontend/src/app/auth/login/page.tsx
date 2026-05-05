@@ -25,7 +25,7 @@ export default function LoginPage() {
         password,
       });
       setUser(data);
-      router.push("/");
+      router.push("/admin");
     } catch (err: any) {
       setError(err.response?.data?.message || "Invalid email or password");
     }

@@ -10,7 +10,9 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://oursfit-backends.onr
 
 import { getImageUrl } from "@/utils/getImageUrl";
 
-export default function ShopPage() {
+import { Suspense } from "react";
+
+function ShopContent() {
   const searchParams = useSearchParams();
   const searchFilter = searchParams.get('search')?.toLowerCase() || "";
   const [activeCategory, setActiveCategory] = useState("All");
@@ -99,5 +101,13 @@ export default function ShopPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function ShopPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center font-bold uppercase tracking-widest opacity-50">Loading shop...</div>}>
+      <ShopContent />
+    </Suspense>
   );
 }
