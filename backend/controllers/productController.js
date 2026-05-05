@@ -105,12 +105,17 @@ const deleteProduct = async (req, res) => {
 // @access  Private/Admin
 const applyGlobalSale = async (req, res) => {
   try {
-    const { discountPercentage } = req.body;
+    const { discountPercentage, category } = req.body;
     if (discountPercentage === undefined || discountPercentage < 0 || discountPercentage > 100) {
       return res.status(400).json({ message: 'Valid discount percentage (0-100) is required.' });
     }
 
-    const products = await Product.find({});
+    const query = {};
+    if (category && category !== 'All') {
+      query.category = category;
+    }
+
+    const products = await Product.find(query);
     
     // If discount is 0, we reset the sale (price = originalPrice)
     for (let product of products) {
@@ -132,7 +137,8 @@ const applyGlobalSale = async (req, res) => {
       await product.save();
     }
 
-    res.json({ message: `Global sale of ${discountPercentage}% applied to all products.` });
+    const targetMsg = category && category !== 'All' ? `products in category '${category}'` : 'all products';
+    res.json({ message: `Sale of ${discountPercentage}% applied to ${targetMsg}.` });
   } catch (error) {
     console.error('Global Sale Error:', error);
     res.status(500).json({ message: 'Server Error' });

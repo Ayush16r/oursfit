@@ -14,21 +14,32 @@ export default function MarketingSettings() {
   
   const [deliveryDays, setDeliveryDays] = useState(5);
   const [discountPercent, setDiscountPercent] = useState(0);
+  const [saleCategory, setSaleCategory] = useState("All");
+  const [categories, setCategories] = useState<string[]>([]);
 
   useEffect(() => {
-    const fetchSettings = async () => {
+    const fetchSettingsAndCategories = async () => {
       try {
-        const { data } = await axios.get(`${API_URL}/settings`);
-        if (data && data.deliveryDays) {
-          setDeliveryDays(data.deliveryDays);
+        const [settingsRes, productsRes] = await Promise.all([
+          axios.get(`${API_URL}/settings`),
+          axios.get(`${API_URL}/products`)
+        ]);
+        
+        if (settingsRes.data && settingsRes.data.deliveryDays) {
+          setDeliveryDays(settingsRes.data.deliveryDays);
+        }
+        
+        if (productsRes.data && Array.isArray(productsRes.data)) {
+           const uniqueCategories = Array.from(new Set(productsRes.data.map((p: any) => p.category)));
+           setCategories(uniqueCategories as string[]);
         }
       } catch (error) {
-        console.error("Failed to fetch settings", error);
+        console.error("Failed to fetch data", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchSettings();
+    fetchSettingsAndCategories();
   }, []);
 
   const handleSaveSettings = async () => {
@@ -46,14 +57,18 @@ export default function MarketingSettings() {
   };
 
   const handleApplyGlobalSale = async () => {
-    if (!confirm(`Are you sure you want to apply a ${discountPercent}% discount to ALL products? (Setting to 0 resets the sale)`)) {
+    const targetMsg = saleCategory === "All" ? "ALL products" : `all products in category '${saleCategory}'`;
+    if (!confirm(`Are you sure you want to apply a ${discountPercent}% discount to ${targetMsg}? (Setting to 0 resets the sale)`)) {
       return;
     }
     
     try {
       setSaving(true);
       const config = { headers: { Authorization: `Bearer ${user?.token}` } };
-      const { data } = await axios.post(`${API_URL}/products/sale`, { discountPercentage: Number(discountPercent) }, config);
+      const { data } = await axios.post(`${API_URL}/products/sale`, { 
+        discountPercentage: Number(discountPercent),
+        category: saleCategory
+      }, config);
       alert(data.message);
     } catch (error) {
       console.error(error);
@@ -122,16 +137,32 @@ export default function MarketingSettings() {
               </p>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-widest opacity-70 mb-2">Sale Percentage (%)</label>
-              <input 
-                type="number" 
-                min="0"
-                max="100"
-                value={discountPercent}
-                onChange={(e) => setDiscountPercent(Number(e.target.value))}
-                className="w-full bg-transparent border border-border p-3 rounded focus:outline-none focus:border-red-500 text-red-500 font-bold"
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-widest opacity-70 mb-2">Target Category</label>
+                <select 
+                  value={saleCategory}
+                  onChange={(e) => setSaleCategory(e.target.value)}
+                  className="w-full bg-transparent border border-border p-3 rounded focus:outline-none focus:border-foreground"
+                >
+                  <option value="All">All Products (Overall)</option>
+                  {categories.map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-widest opacity-70 mb-2">Sale Percentage (%)</label>
+                <input 
+                  type="number" 
+                  min="0"
+                  max="100"
+                  value={discountPercent}
+                  onChange={(e) => setDiscountPercent(Number(e.target.value))}
+                  className="w-full bg-transparent border border-border p-3 rounded focus:outline-none focus:border-red-500 text-red-500 font-bold"
+                />
+              </div>
             </div>
             
             <button 

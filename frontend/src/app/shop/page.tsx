@@ -84,6 +84,11 @@ function ShopContent() {
                     View Details
                   </span>
                 </div>
+                {product.originalPrice && product.originalPrice > product.price && (
+                  <div className="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-1 uppercase tracking-widest z-10">
+                    -{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
+                  </div>
+                )}
               </div>
               <div className="flex justify-between items-start">
                 <div>

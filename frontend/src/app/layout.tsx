@@ -14,6 +14,13 @@ export const metadata: Metadata = {
   description: "Not for all. Only for us. A premium streetwear brand representing the new generation.",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{

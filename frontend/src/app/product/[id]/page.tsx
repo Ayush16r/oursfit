@@ -158,7 +158,15 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
               
               <div className="flex items-baseline space-x-2">
                 <span className="text-2xl font-bold">₹ {product.price}</span>
+                {product.originalPrice && product.originalPrice > product.price && (
+                   <span className="text-sm line-through text-muted-foreground font-bold">₹ {product.originalPrice}</span>
+                )}
               </div>
+              {product.originalPrice && product.originalPrice > product.price && (
+                <div className="inline-block mt-2 bg-red-600 text-white text-xs font-bold px-3 py-1 uppercase tracking-widest rounded-sm shadow-sm">
+                  SAVE {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
+                </div>
+              )}
               <p className="text-[10px] text-muted-foreground mt-1">Price incl. of all taxes</p>
             </div>
 
@@ -217,7 +225,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             </div>
 
             {/* Actions */}
-            <div className="flex gap-4 pt-2">
+            <div className="flex flex-col sm:flex-row gap-4 pt-2">
               <button 
                 onClick={handleAddToCart}
                 className="flex-1 bg-[#F14633] hover:bg-[#D93D2C] text-white font-bold py-3 px-6 rounded transition-colors text-sm tracking-wide"

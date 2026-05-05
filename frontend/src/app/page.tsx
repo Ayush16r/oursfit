@@ -131,6 +131,11 @@ export default function Home() {
                           FEW LEFT
                         </div>
                       )}
+                      {product.originalPrice && product.originalPrice > product.price && (
+                        <div className="absolute top-4 right-4 bg-red-600 text-white text-[10px] font-bold px-2 py-1 uppercase tracking-widest z-10 shadow-sm">
+                          -{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
+                        </div>
+                      )}
                     </div>
                     <div>
                       <h3 className="font-bold text-sm text-[#2d2d2d] truncate">{product.name}</h3>
