@@ -82,10 +82,16 @@ export default function AdminProducts() {
 
       const { data } = await axios.post(`${API_URL}/upload`, formData, config);
       
-      // Update the editing product with the new image URL appended
+      // Update the editing product with the new image URL appended or replacing the sample image
+      const imageUrl = data.startsWith('http') ? data : `${API_URL.replace('/api', '')}${data}`;
+      const currentImages = editingProduct.images || [];
+      const newImages = currentImages.length === 1 && currentImages[0].includes('sample.jpg') 
+        ? [imageUrl] 
+        : [...currentImages, imageUrl];
+
       setEditingProduct({
         ...editingProduct,
-        images: [...(editingProduct.images || []), `${API_URL.replace('/api', '')}${data}`]
+        images: newImages
       });
       setUploadingImage(false);
     } catch (error) {

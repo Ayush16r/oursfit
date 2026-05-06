@@ -27,6 +27,9 @@ const updateSettings = async (req, res) => {
     
     settings.deliveryDays = req.body.deliveryDays !== undefined ? req.body.deliveryDays : settings.deliveryDays;
     settings.freeShippingThreshold = req.body.freeShippingThreshold !== undefined ? req.body.freeShippingThreshold : settings.freeShippingThreshold;
+    settings.codFee = req.body.codFee !== undefined ? req.body.codFee : settings.codFee;
+    settings.gstPercentage = req.body.gstPercentage !== undefined ? req.body.gstPercentage : settings.gstPercentage;
+    settings.gstThreshold = req.body.gstThreshold !== undefined ? req.body.gstThreshold : settings.gstThreshold;
 
     const updatedSettings = await settings.save();
     res.json(updatedSettings);

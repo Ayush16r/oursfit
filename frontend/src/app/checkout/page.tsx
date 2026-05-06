@@ -20,13 +20,37 @@ export default function CheckoutPage() {
   const { user, cart, removeFromCart, updateQuantity, clearCart, appliedCoupon, setAppliedCoupon, wishlist, setWishlist, addresses, setAddresses } = useStore();
   
   const [step, setStep] = useState<"BAG" | "ADDRESS" | "PAYMENT">("BAG");
+  const [storeSettings, setStoreSettings] = useState<any>(null);
   
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const { data } = await axios.get(`${API_URL}/settings`);
+        setStoreSettings(data);
+      } catch (error) {
+        console.error("Failed to fetch settings", error);
+      }
+    };
+    fetchSettings();
+  }, []);
+  
+  // Settings mapping
+  const freeShippingThreshold = storeSettings?.freeShippingThreshold || 1000;
+  const deliveryDays = storeSettings?.deliveryDays || 5;
+  const codFeeSettings = storeSettings?.codFee !== undefined ? storeSettings.codFee : 50;
+  const gstPercentage = storeSettings?.gstPercentage !== undefined ? storeSettings.gstPercentage : 18;
+  const gstThreshold = storeSettings?.gstThreshold !== undefined ? storeSettings.gstThreshold : 1000;
+
   // Pricing
   const subtotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
   const memberSavings = user?.isMember ? Math.min(100, subtotal * 0.1) : 0; // Fake logic: 10% up to 100
   const couponDiscount = appliedCoupon ? (subtotal * appliedCoupon.discountPercentage) / 100 : 0;
-  const shipping = subtotal > 1000 ? 0 : 50;
-  const totalAmount = subtotal - memberSavings - couponDiscount + shipping;
+  const shipping = subtotal > freeShippingThreshold ? 0 : 50;
+  const discountTotal = memberSavings + couponDiscount;
+  const netSubtotal = subtotal - discountTotal;
+  const gstAmount = netSubtotal < gstThreshold ? (netSubtotal * gstPercentage) / 100 : 0;
+  // Note: Payment Method state is needed here to determine COD fee but it's defined later. 
+  // We'll compute codFee dynamically inside the BillingDetails and pass to totalAmount dynamically during render/submission.
 
   // Accorion states
   const [couponOpen, setCouponOpen] = useState(false);
@@ -139,9 +163,9 @@ export default function CheckoutPage() {
           shippingAddress: selAddress,
           paymentMethod: paymentMethod === "Card" ? "Razorpay" : paymentMethod,
           itemsPrice: subtotal,
-          taxPrice: 0,
+          taxPrice: gstAmount,
           shippingPrice: shipping,
-          totalPrice: totalAmount,
+          totalPrice: netSubtotal + shipping + gstAmount + (paymentMethod === "COD" ? codFeeSettings : 0),
         },
         config
       );
@@ -235,9 +259,23 @@ export default function CheckoutPage() {
           </span>
         </div>
 
+        {paymentMethod === "COD" && (
+          <div className="flex justify-between">
+            <span>COD Fee</span>
+            <span className="font-bold">₹ {codFeeSettings.toFixed(2)}</span>
+          </div>
+        )}
+
+        {gstAmount > 0 && (
+          <div className="flex justify-between">
+            <span>GST ({gstPercentage}%)</span>
+            <span className="font-bold">₹ {gstAmount.toFixed(2)}</span>
+          </div>
+        )}
+
         <div className="border-t border-border pt-4 mt-2 flex justify-between font-bold text-base">
           <span>Total Amount <span className="text-xs font-normal opacity-70">(Incl. of GST)</span></span>
-          <span>₹ {totalAmount.toFixed(2)}</span>
+          <span>₹ {(netSubtotal + shipping + gstAmount + (paymentMethod === "COD" ? codFeeSettings : 0)).toFixed(2)}</span>
         </div>
       </div>
     </div>

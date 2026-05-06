@@ -10,6 +10,21 @@ const settingsSchema = new mongoose.Schema({
     type: Number,
     required: true,
     default: 1000,
+  },
+  codFee: {
+    type: Number,
+    required: true,
+    default: 50,
+  },
+  gstPercentage: {
+    type: Number,
+    required: true,
+    default: 18,
+  },
+  gstThreshold: {
+    type: Number,
+    required: true,
+    default: 1000,
   }
 }, {
   timestamps: true,
