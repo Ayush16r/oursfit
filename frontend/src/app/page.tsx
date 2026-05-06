@@ -115,7 +115,7 @@ export default function Home() {
           <div className="relative">
             <div className="flex space-x-4 overflow-x-auto pb-8 snap-x scrollbar-hide">
               {products.length > 0 ? products.map((product) => (
-                <div key={product._id} className="min-w-[280px] md:min-w-[350px] snap-start group cursor-pointer">
+                <div key={product._id} className="w-[280px] min-w-[280px] md:w-[350px] md:min-w-[350px] shrink-0 snap-start group cursor-pointer">
                   <Link href={`/product/${product._id}`}>
                     <div className="relative aspect-[3/4] bg-muted overflow-hidden mb-4">
                       <img 

@@ -35,8 +35,8 @@ export default function CheckoutPage() {
   }, []);
   
   // Settings mapping
-  const freeShippingThreshold = storeSettings?.freeShippingThreshold || 1000;
-  const deliveryDays = storeSettings?.deliveryDays || 5;
+  const freeShippingThreshold = storeSettings?.freeShippingThreshold !== undefined ? storeSettings.freeShippingThreshold : 1000;
+  const deliveryDays = storeSettings?.deliveryDays !== undefined ? storeSettings.deliveryDays : 5;
   const codFeeSettings = storeSettings?.codFee !== undefined ? storeSettings.codFee : 50;
   const gstPercentage = storeSettings?.gstPercentage !== undefined ? storeSettings.gstPercentage : 18;
   const gstThreshold = storeSettings?.gstThreshold !== undefined ? storeSettings.gstThreshold : 1000;
