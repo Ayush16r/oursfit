@@ -39,6 +39,7 @@ interface StoreState {
   setWishlist: (wishlist: string[]) => void;
   setAddresses: (addresses: any[]) => void;
   setAppliedCoupon: (coupon: { code: string; discountPercentage: number } | null) => void;
+  logout: () => void;
 }
 
 export const useStore = create<StoreState>()(
@@ -139,6 +140,7 @@ export const useStore = create<StoreState>()(
       setWishlist: (wishlist) => set({ wishlist }),
       setAddresses: (addresses) => set({ addresses }),
       setAppliedCoupon: (appliedCoupon) => set({ appliedCoupon }),
+      logout: () => set({ user: null, cart: [], wishlist: [], addresses: [], appliedCoupon: null }),
     }),
     {
       name: 'oursfit-storage',

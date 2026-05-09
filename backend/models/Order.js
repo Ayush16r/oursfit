@@ -13,6 +13,7 @@ const orderSchema = new mongoose.Schema({
       image: { type: String, required: true },
       price: { type: Number, required: true },
       size: { type: String, required: true },
+      color: { type: String }, // New variant support
       product: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
@@ -26,6 +27,7 @@ const orderSchema = new mongoose.Schema({
     state: { type: String, required: true },
     postalCode: { type: String, required: true },
     country: { type: String, required: true },
+    phone: { type: String }, // New
   },
   paymentMethod: {
     type: String,
@@ -76,9 +78,32 @@ const orderSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'confirmed', 'processing', 'shipped', 'out for delivery', 'delivered', 'cancelled'],
+    enum: ['pending', 'confirmed', 'processing', 'packed', 'shipped', 'out for delivery', 'delivered', 'delayed', 'cancelled', 'returned', 'refund initiated', 'refund completed'],
     default: 'pending',
   },
+  
+  // Advanced Shipping Logic
+  trackingId: { type: String },
+  courierPartner: { type: String },
+  deliveryNotes: { type: String },
+  estimatedDelivery: { type: Date },
+  
+  timeline: [
+    {
+      status: { type: String, required: true },
+      date: { type: Date, default: Date.now },
+      description: { type: String }
+    }
+  ],
+
+  // Admin and Return management
+  adminNotes: { type: String },
+  returnRequest: {
+    isRequested: { type: Boolean, default: false },
+    reason: { type: String },
+    status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' }
+  },
+
   razorpayOrderId: {
     type: String,
   },
@@ -90,6 +115,18 @@ const orderSchema = new mongoose.Schema({
   }
 }, {
   timestamps: true,
+});
+
+// Auto-add timeline events when status changes
+orderSchema.pre('save', function(next) {
+  if (this.isModified('status')) {
+    this.timeline.push({
+      status: this.status,
+      date: new Date(),
+      description: `Order marked as ${this.status}`
+    });
+  }
+  next();
 });
 
 const Order = mongoose.model('Order', orderSchema);

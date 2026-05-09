@@ -211,6 +211,42 @@ const resetPassword = async (req, res) => {
   }
 };
 
+// @desc    Get all users with order stats
+// @route   GET /api/auth
+// @access  Private/Admin
+const getUsersAdmin = async (req, res) => {
+  try {
+    const Order = require('../models/Order'); // Load Order model
+    
+    // Aggregate order data per user
+    const userStats = await Order.aggregate([
+      { $match: { isPaid: true } },
+      { $group: { _id: '$user', orderCount: { $sum: 1 }, totalSpent: { $sum: '$totalPrice' } } }
+    ]);
+    
+    const statsMap = {};
+    userStats.forEach(stat => {
+      statsMap[stat._id.toString()] = { orderCount: stat.orderCount, totalSpent: stat.totalSpent };
+    });
+
+    const users = await User.find({}).select('-password');
+    
+    const usersWithStats = users.map(user => {
+      const stats = statsMap[user._id.toString()] || { orderCount: 0, totalSpent: 0 };
+      return {
+        ...user._doc,
+        orderCount: stats.orderCount,
+        totalSpent: stats.totalSpent
+      };
+    });
+
+    res.json(usersWithStats);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
 module.exports = {
   authUser,
   registerUser,
@@ -219,4 +255,5 @@ module.exports = {
   resetPassword,
   toggleWishlist,
   addAddress,
+  getUsersAdmin,
 };

@@ -137,11 +137,16 @@ const updateOrderToDelivered = async (req, res) => {
 // @access  Private/Admin
 const updateOrderStatus = async (req, res) => {
   try {
-    const { status } = req.body;
+    const { status, trackingId, courierPartner, deliveryNotes, estimatedDelivery } = req.body;
     const order = await Order.findById(req.params.id);
 
     if (order) {
-      order.status = status;
+      if (status) order.status = status;
+      if (trackingId) order.trackingId = trackingId;
+      if (courierPartner) order.courierPartner = courierPartner;
+      if (deliveryNotes) order.deliveryNotes = deliveryNotes;
+      if (estimatedDelivery) order.estimatedDelivery = estimatedDelivery;
+
       if (status === 'delivered') {
         order.isDelivered = true;
         order.deliveredAt = Date.now();

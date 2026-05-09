@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Search, Filter, RefreshCw, CheckCircle } from "lucide-react";
 import axios from "axios";
 import { useStore } from "@/store/useStore";
+import Link from "next/link";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
@@ -13,7 +14,6 @@ export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const { user } = useStore();
 
@@ -240,9 +240,9 @@ export default function AdminOrders() {
                         Print Label
                       </button>
                     )}
-                    <button onClick={() => setSelectedOrder(order)} className="text-xs font-bold uppercase tracking-widest underline underline-offset-4 hover:opacity-70 transition-opacity ml-4">
+                    <Link href={`/admin/orders/${order._id}`} className="text-xs font-bold uppercase tracking-widest underline underline-offset-4 hover:opacity-70 transition-opacity ml-4">
                       Details
-                    </button>
+                    </Link>
                   </td>
                 </tr>
               ))}
@@ -250,72 +250,6 @@ export default function AdminOrders() {
           </table>
         </div>
       </div>
-
-      {selectedOrder && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
-            <div className="p-4 border-b border-border flex justify-between items-center bg-muted/20">
-              <h2 className="text-lg font-bold uppercase tracking-widest text-foreground">Order Details</h2>
-              <button onClick={() => setSelectedOrder(null)} className="text-red-500 font-bold hover:opacity-70 transition-opacity">
-                CLOSE
-              </button>
-            </div>
-            
-            <div className="p-6 overflow-y-auto flex-1 space-y-6">
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Order ID</p>
-                  <p className="font-mono">{selectedOrder._id}</p>
-                </div>
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Date Placed</p>
-                  <p>{new Date(selectedOrder.createdAt).toLocaleString()}</p>
-                </div>
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Payment Status</p>
-                  <p className="uppercase font-bold text-teal-600">{selectedOrder.paymentStatus} ({selectedOrder.paymentMethod})</p>
-                </div>
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Total Amount</p>
-                  <p className="font-bold">₹ {selectedOrder.totalPrice?.toFixed(2)}</p>
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3 border-b border-border pb-2">Shipping Address</h3>
-                <div className="text-sm">
-                  <p className="font-bold">{selectedOrder.user?.name}</p>
-                  <p>{selectedOrder.shippingAddress?.street}</p>
-                  <p>{selectedOrder.shippingAddress?.city}, {selectedOrder.shippingAddress?.state}</p>
-                  <p>{selectedOrder.shippingAddress?.country} - {selectedOrder.shippingAddress?.postalCode}</p>
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3 border-b border-border pb-2">Items Ordered ({selectedOrder.orderItems?.length})</h3>
-                <div className="space-y-4">
-                  {selectedOrder.orderItems?.map((item: any, i: number) => (
-                    <div key={i} className="flex space-x-4">
-                      <div className="w-16 h-20 bg-muted rounded overflow-hidden flex-shrink-0">
-                        {/* Use img to bypass strict Next.js external Image configs */}
-                        <img src={getImageUrl(item.image)} alt={item.name} className="w-full h-full object-cover" />
-                      </div>
-                      <div className="flex-1 flex justify-between">
-                        <div>
-                          <p className="font-bold text-sm">{item.name}</p>
-                          <p className="text-xs text-muted-foreground mt-1 uppercase tracking-widest">Size: {item.size}</p>
-                          <p className="text-xs text-muted-foreground mt-1 uppercase tracking-widest">Qty: {item.qty}</p>
-                        </div>
-                        <p className="font-bold text-sm">₹ {(item.price * item.qty).toFixed(2)}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

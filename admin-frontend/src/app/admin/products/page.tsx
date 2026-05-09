@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
-import { Plus, Edit2, Trash2, RefreshCw, UploadCloud, X, Search, Filter, Image as ImageIcon } from "lucide-react";
+import { Plus, Edit2, Trash2, RefreshCw, UploadCloud, X, Search, Filter, Image as ImageIcon, Package } from "lucide-react";
 import axios from "axios";
 import { useStore } from "@/store/useStore";
 import { motion, AnimatePresence } from "framer-motion";
