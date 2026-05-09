@@ -2,16 +2,32 @@
 
 import Link from "next/link";
 import { ShoppingBag, User, Search, Menu, Heart } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStore } from "@/store/useStore";
 import { useRouter } from "next/navigation";
+import axios from "axios";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://oursfit-backends.onrender.com/api';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [settings, setSettings] = useState<any>(null);
   const cart = useStore((state) => state.cart);
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const { data } = await axios.get(`${API_URL}/settings`);
+        setSettings(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchSettings();
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,6 +38,17 @@ export default function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-border">
+      {settings?.announcementActive && settings?.announcementText && (
+        <div className="bg-accent text-white text-[10px] font-bold uppercase tracking-widest py-1.5 overflow-hidden whitespace-nowrap">
+          <div className="animate-[marquee_20s_linear_infinite] inline-block">
+            <span className="mx-4">{settings.announcementText}</span>
+            <span className="mx-4">{settings.announcementText}</span>
+            <span className="mx-4">{settings.announcementText}</span>
+            <span className="mx-4">{settings.announcementText}</span>
+            <span className="mx-4">{settings.announcementText}</span>
+          </div>
+        </div>
+      )}
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         
         <div className="flex items-center">

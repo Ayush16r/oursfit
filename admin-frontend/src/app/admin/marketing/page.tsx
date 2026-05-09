@@ -1,16 +1,52 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Percent, Megaphone, Zap, X, Save } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import axios from "axios";
+import { useStore } from "@/store/useStore";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
 export default function AdminMarketingPage() {
+  const { user } = useStore();
   const [activeModal, setActiveModal] = useState<string | null>(null);
+  const [settings, setSettings] = useState<any>({});
+  const [saving, setSaving] = useState(false);
 
-  const handleSave = (e: React.FormEvent) => {
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const { data } = await axios.get(`${API_URL}/settings`);
+        setSettings(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchSettings();
+  }, []);
+
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert("Saved successfully! (Backend integration pending for this module)");
-    setActiveModal(null);
+    if (activeModal === 'announcement') {
+      try {
+        setSaving(true);
+        const config = { headers: { Authorization: `Bearer ${user?.token}` } };
+        await axios.put(`${API_URL}/settings`, {
+          announcementText: settings.announcementText,
+          announcementActive: settings.announcementActive
+        }, config);
+        alert("Announcement banner updated successfully!");
+        setActiveModal(null);
+      } catch (error) {
+        alert("Failed to save settings");
+      } finally {
+        setSaving(false);
+      }
+    } else {
+      alert("Saved successfully! (Backend integration pending for this module)");
+      setActiveModal(null);
+    }
   };
 
   return (
@@ -94,11 +130,12 @@ export default function AdminMarketingPage() {
                     <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1 block">Banner Text</label>
                     <textarea 
                       required 
-                      defaultValue="USE CODE 'WELCOME10' FOR 10% OFF YOUR FIRST ORDER"
+                      value={settings.announcementText || "USE CODE 'WELCOME10' FOR 10% OFF YOUR FIRST ORDER"}
+                      onChange={e => setSettings({...settings, announcementText: e.target.value})}
                       className="w-full bg-background border border-border rounded-lg p-3 text-sm focus:ring-2 focus:ring-accent outline-none min-h-[100px]"
                     />
                     <label className="flex items-center space-x-2 cursor-pointer mt-4 p-3 border border-border rounded-lg hover:bg-muted/30">
-                      <input type="checkbox" defaultChecked className="accent-accent" />
+                      <input type="checkbox" checked={settings.announcementActive ?? true} onChange={e => setSettings({...settings, announcementActive: e.target.checked})} className="accent-accent" />
                       <span className="text-sm font-bold uppercase">Show Banner on Storefront</span>
                     </label>
                   </div>
@@ -125,8 +162,8 @@ export default function AdminMarketingPage() {
                   </div>
                 )}
 
-                <button type="submit" className="w-full btn-primary py-3 flex items-center justify-center gap-2 mt-6">
-                  <Save className="w-5 h-5" /> Save Changes
+                <button disabled={saving} type="submit" className="w-full btn-primary py-3 flex items-center justify-center gap-2 mt-6">
+                  {saving ? "Saving..." : <><Save className="w-5 h-5" /> Save Changes</>}
                 </button>
               </form>
             </motion.div>

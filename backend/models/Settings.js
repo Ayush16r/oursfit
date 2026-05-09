@@ -25,6 +25,14 @@ const settingsSchema = new mongoose.Schema({
     type: Number,
     required: true,
     default: 1000,
+  },
+  announcementText: {
+    type: String,
+    default: "USE CODE 'WELCOME10' FOR 10% OFF YOUR FIRST ORDER",
+  },
+  announcementActive: {
+    type: Boolean,
+    default: true,
   }
 }, {
   timestamps: true,

@@ -29,17 +29,21 @@ const createOrder = async (req, res) => {
   }
 
   try {
-    // 1. Create order in Razorpay
-    const options = {
-      amount: Math.round(totalPrice * 100), // amount in the smallest currency unit (paise)
-      currency: "INR", 
-      receipt: `receipt_order_${Date.now()}`,
-    };
+    // 1. Conditionally Create order in Razorpay
+    let razorpayOrder = null;
+    
+    if (paymentMethod !== 'COD' && paymentMethod !== 'TSS Money') {
+      const options = {
+        amount: Math.round(totalPrice * 100), // amount in the smallest currency unit (paise)
+        currency: "INR", 
+        receipt: `receipt_order_${Date.now()}`,
+      };
 
-    const razorpayOrder = await razorpay.orders.create(options);
+      razorpayOrder = await razorpay.orders.create(options);
 
-    if (!razorpayOrder) {
-      return res.status(500).json({ message: 'Error creating Razorpay order' });
+      if (!razorpayOrder) {
+        return res.status(500).json({ message: 'Error creating Razorpay order' });
+      }
     }
 
     // 2. Create order in MongoDB (pending status)
@@ -53,7 +57,7 @@ const createOrder = async (req, res) => {
       shippingPrice,
       totalPrice,
       paymentStatus: 'pending',
-      razorpayOrderId: razorpayOrder.id,
+      razorpayOrderId: razorpayOrder ? razorpayOrder.id : undefined,
     });
 
     const createdOrder = await order.save();
@@ -61,9 +65,9 @@ const createOrder = async (req, res) => {
     // 3. Return order details to frontend
     res.status(201).json({
       orderId: createdOrder._id,
-      razorpayOrderId: razorpayOrder.id,
-      amount: razorpayOrder.amount,
-      currency: razorpayOrder.currency,
+      razorpayOrderId: razorpayOrder ? razorpayOrder.id : undefined,
+      amount: razorpayOrder ? razorpayOrder.amount : Math.round(totalPrice * 100),
+      currency: razorpayOrder ? razorpayOrder.currency : "INR",
     });
   } catch (error) {
     console.error('Create Order Error:', error);

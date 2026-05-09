@@ -30,6 +30,9 @@ const updateSettings = async (req, res) => {
     settings.codFee = req.body.codFee !== undefined ? req.body.codFee : settings.codFee;
     settings.gstPercentage = req.body.gstPercentage !== undefined ? req.body.gstPercentage : settings.gstPercentage;
     settings.gstThreshold = req.body.gstThreshold !== undefined ? req.body.gstThreshold : settings.gstThreshold;
+    
+    if (req.body.announcementText !== undefined) settings.announcementText = req.body.announcementText;
+    if (req.body.announcementActive !== undefined) settings.announcementActive = req.body.announcementActive;
 
     const updatedSettings = await settings.save();
     res.json(updatedSettings);

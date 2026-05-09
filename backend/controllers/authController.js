@@ -18,6 +18,8 @@ const authUser = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        tssMoney: user.tssMoney,
+        tssPoints: user.tssPoints,
         cart: user.cart,
         token: generateToken(user._id),
       });
@@ -54,6 +56,8 @@ const registerUser = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        tssMoney: user.tssMoney,
+        tssPoints: user.tssPoints,
         cart: user.cart,
         token: generateToken(user._id),
       });
@@ -78,6 +82,8 @@ const getUserProfile = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        tssMoney: user.tssMoney,
+        tssPoints: user.tssPoints,
         isMember: user.isMember,
         addresses: user.addresses,
         wishlist: user.wishlist,

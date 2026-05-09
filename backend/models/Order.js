@@ -120,6 +120,7 @@ const orderSchema = new mongoose.Schema({
 // Auto-add timeline events when status changes
 orderSchema.pre('save', function(next) {
   if (this.isModified('status')) {
+    if (!this.timeline) this.timeline = [];
     this.timeline.push({
       status: this.status,
       date: new Date(),

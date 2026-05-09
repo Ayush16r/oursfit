@@ -33,7 +33,11 @@ const getProductById = async (req, res) => {
 // @access  Private/Admin
 const createProduct = async (req, res) => {
   try {
-    const product = new Product(req.body);
+    const productData = { ...req.body };
+    if (!productData.images || productData.images.length === 0) {
+      productData.images = ['/images/sample.jpg'];
+    }
+    const product = new Product(productData);
 
     const createdProduct = await product.save();
     res.status(201).json(createdProduct);
