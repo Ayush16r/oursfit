@@ -57,7 +57,7 @@ export default function OrderDetailsPage() {
         trackingId,
         courierPartner,
         deliveryNotes,
-        estimatedDelivery
+        estimatedDelivery: estimatedDelivery ? estimatedDelivery : undefined
       };
       
       const { data } = await axios.put(`${API_URL}/orders/${id}/status`, payload, config);
@@ -174,16 +174,16 @@ export default function OrderDetailsPage() {
                  <select 
                    value={status} 
                    onChange={(e) => setStatus(e.target.value)}
-                   className="w-full bg-background border border-border rounded-lg p-3 text-sm focus:ring-2 focus:ring-accent outline-none font-bold uppercase tracking-widest"
+                   className="w-full bg-background border border-border rounded-lg p-3 text-sm focus:ring-2 focus:ring-accent outline-none font-bold uppercase tracking-widest text-foreground"
                  >
-                   <option value="pending">Pending</option>
-                   <option value="confirmed">Confirmed</option>
-                   <option value="processing">Processing</option>
-                   <option value="packed">Packed</option>
-                   <option value="shipped">Shipped</option>
-                   <option value="out for delivery">Out for Delivery</option>
-                   <option value="delivered">Delivered</option>
-                   <option value="cancelled">Cancelled</option>
+                   <option className="bg-background text-foreground" value="pending">Pending</option>
+                   <option className="bg-background text-foreground" value="confirmed">Confirmed</option>
+                   <option className="bg-background text-foreground" value="processing">Processing</option>
+                   <option className="bg-background text-foreground" value="packed">Packed</option>
+                   <option className="bg-background text-foreground" value="shipped">Shipped</option>
+                   <option className="bg-background text-foreground" value="out for delivery">Out for Delivery</option>
+                   <option className="bg-background text-foreground" value="delivered">Delivered</option>
+                   <option className="bg-background text-foreground" value="cancelled">Cancelled</option>
                  </select>
                </div>
                

@@ -12,5 +12,6 @@ router.put('/resetpassword/:resettoken', resetPassword);
 
 // Admin Routes
 router.get('/', protect, admin, getUsersAdmin);
+router.put('/admin/users/:id', protect, admin, require('../controllers/authController').updateUserAdmin);
 
 module.exports = router;

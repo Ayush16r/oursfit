@@ -247,6 +247,36 @@ const getUsersAdmin = async (req, res) => {
   }
 };
 
+// @desc    Update user (Role, TSS Money, TSS Points)
+// @route   PUT /api/auth/admin/users/:id
+// @access  Private/Admin
+const updateUserAdmin = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (user) {
+      user.role = req.body.role || user.role;
+      if (req.body.tssMoney !== undefined) user.tssMoney = req.body.tssMoney;
+      if (req.body.tssPoints !== undefined) user.tssPoints = req.body.tssPoints;
+
+      const updatedUser = await user.save();
+
+      res.json({
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        tssMoney: updatedUser.tssMoney,
+        tssPoints: updatedUser.tssPoints,
+      });
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
 module.exports = {
   authUser,
   registerUser,
@@ -256,4 +286,5 @@ module.exports = {
   toggleWishlist,
   addAddress,
   getUsersAdmin,
+  updateUserAdmin,
 };

@@ -33,17 +33,7 @@ const getProductById = async (req, res) => {
 // @access  Private/Admin
 const createProduct = async (req, res) => {
   try {
-    const product = new Product({
-      name: 'New Product Name',
-      price: 0,
-      description: 'Product description goes here...',
-      images: ['/images/sample.jpg'],
-      category: 'T-Shirts',
-      status: 'draft',
-      isNewArrival: true,
-      variants: [],
-      stock: 0,
-    });
+    const product = new Product(req.body);
 
     const createdProduct = await product.save();
     res.status(201).json(createdProduct);

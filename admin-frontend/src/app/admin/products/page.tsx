@@ -77,12 +77,8 @@ export default function AdminProducts() {
         // Update
         await axios.put(`${API_URL}/products/${editingProduct._id}`, editingProduct, config);
       } else {
-        // Since backend create is dummy, we can't create fully populated unless we override backend logic. 
-        // Oh wait, our new backend createProduct uses dummy data. Let's send the full payload to a POST. 
-        // Wait, the backend createProduct ignores req.body. 
-        // We should hit POST, get the dummy, then immediately PUT with the real data.
-        const { data: dummy } = await axios.post(`${API_URL}/products`, {}, config);
-        await axios.put(`${API_URL}/products/${dummy._id}`, editingProduct, config);
+        // Create new
+        await axios.post(`${API_URL}/products`, editingProduct, config);
       }
       
       handleCloseModal();

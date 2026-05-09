@@ -51,6 +51,14 @@ const userSchema = new mongoose.Schema({
       required: true
     }
   }],
+  tssMoney: {
+    type: Number,
+    default: 0,
+  },
+  tssPoints: {
+    type: Number,
+    default: 0,
+  },
   resetPasswordToken: String,
   resetPasswordExpire: Date,
 }, {
