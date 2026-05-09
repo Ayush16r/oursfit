@@ -34,19 +34,22 @@ const getProductById = async (req, res) => {
 const createProduct = async (req, res) => {
   try {
     const product = new Product({
-      name: 'Sample name',
+      name: 'New Product Name',
       price: 0,
-      description: 'Sample description',
+      description: 'Product description goes here...',
       images: ['/images/sample.jpg'],
-      sizes: ['M', 'L'],
-      category: 'Sample category',
+      category: 'T-Shirts',
+      status: 'draft',
+      isNewArrival: true,
+      variants: [],
       stock: 0,
     });
 
     const createdProduct = await product.save();
     res.status(201).json(createdProduct);
   } catch (error) {
-    res.status(500).json({ message: 'Server Error' });
+    console.error('Create product error:', error);
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 
@@ -54,23 +57,38 @@ const createProduct = async (req, res) => {
 // @route   PUT /api/products/:id
 // @access  Private/Admin
 const updateProduct = async (req, res) => {
-  const { name, price, description, images, sizes, category, stock, tags, details } = req.body;
+  const { 
+    name, price, originalPrice, description, images, 
+    sizes, category, stock, tags, details,
+    variants, fabric, seoTitle, seoDescription,
+    isFeatured, isTrending, isNewArrival, status, launchDate 
+  } = req.body;
 
   try {
     const product = await Product.findById(req.params.id);
 
     if (product) {
-      product.name = name || product.name;
-      product.price = price !== undefined ? price : product.price;
-      product.description = description || product.description;
-      product.images = images || product.images;
-      product.sizes = sizes || product.sizes;
-      product.category = category || product.category;
-      product.stock = stock !== undefined ? stock : product.stock;
-      product.tags = tags || product.tags;
-      if (details !== undefined) {
-         product.details = details;
-      }
+      if (name !== undefined) product.name = name;
+      if (price !== undefined) product.price = price;
+      if (originalPrice !== undefined) product.originalPrice = originalPrice;
+      if (description !== undefined) product.description = description;
+      if (images !== undefined) product.images = images;
+      if (sizes !== undefined) product.sizes = sizes;
+      if (category !== undefined) product.category = category;
+      if (stock !== undefined) product.stock = stock;
+      if (tags !== undefined) product.tags = tags;
+      if (details !== undefined) product.details = details;
+      
+      // New fields
+      if (variants !== undefined) product.variants = variants;
+      if (fabric !== undefined) product.fabric = fabric;
+      if (seoTitle !== undefined) product.seoTitle = seoTitle;
+      if (seoDescription !== undefined) product.seoDescription = seoDescription;
+      if (isFeatured !== undefined) product.isFeatured = isFeatured;
+      if (isTrending !== undefined) product.isTrending = isTrending;
+      if (isNewArrival !== undefined) product.isNewArrival = isNewArrival;
+      if (status !== undefined) product.status = status;
+      if (launchDate !== undefined) product.launchDate = launchDate;
 
       const updatedProduct = await product.save();
       res.json(updatedProduct);
@@ -78,7 +96,8 @@ const updateProduct = async (req, res) => {
       res.status(404).json({ message: 'Product not found' });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Server Error' });
+    console.error('Update product error:', error);
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 

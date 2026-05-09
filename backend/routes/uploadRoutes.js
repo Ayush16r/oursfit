@@ -68,14 +68,24 @@ const upload = multer({
   },
 });
 
+// Single image upload
 router.post('/', upload.single('image'), (req, res) => {
   if (isCloudinaryConfigured) {
-    // Cloudinary returns the full secure_url
     res.send(req.file.path);
   } else {
-    // Local fallback
     const imagePath = `/${req.file.path.replace(/\\/g, '/')}`;
     res.send(imagePath);
+  }
+});
+
+// Multiple images upload
+router.post('/multiple', upload.array('images', 10), (req, res) => {
+  if (isCloudinaryConfigured) {
+    const filePaths = req.files.map(file => file.path);
+    res.json(filePaths);
+  } else {
+    const filePaths = req.files.map(file => `/${file.path.replace(/\\/g, '/')}`);
+    res.json(filePaths);
   }
 });
 
