@@ -94,7 +94,7 @@ const productSchema = new mongoose.Schema({
 });
 
 // Auto-calculate discount percentage and total stock before saving
-productSchema.pre('save', function(next) {
+productSchema.pre('save', function() {
   if (this.originalPrice && this.originalPrice > this.price) {
     this.discountPercentage = Math.round(((this.originalPrice - this.price) / this.originalPrice) * 100);
   } else {
@@ -104,9 +104,8 @@ productSchema.pre('save', function(next) {
   if (this.variants && this.variants.length > 0) {
     this.stock = this.variants.reduce((total, v) => total + (v.stock || 0), 0);
   }
-  
-  next();
 });
+
 
 const Product = mongoose.model('Product', productSchema);
 module.exports = Product;

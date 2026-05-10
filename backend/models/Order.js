@@ -123,7 +123,7 @@ const orderSchema = new mongoose.Schema({
 });
 
 // Auto-add timeline events when status changes
-orderSchema.pre('save', function(next) {
+orderSchema.pre('save', function() {
   if (this.isModified('status')) {
     if (!this.timeline) this.timeline = [];
     this.timeline.push({
@@ -132,7 +132,6 @@ orderSchema.pre('save', function(next) {
       description: `Order marked as ${this.status}`
     });
   }
-  next();
 });
 
 const Order = mongoose.model('Order', orderSchema);
