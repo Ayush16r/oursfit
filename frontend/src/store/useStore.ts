@@ -14,6 +14,8 @@ interface User {
   wishlist?: string[];
   addresses?: any[];
   cart?: any[];
+  tssPoints?: number;
+  tssMoney?: number;
 }
 
 interface CartItem {
