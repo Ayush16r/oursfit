@@ -181,6 +181,18 @@ export default function ProfilePage() {
               </div>
             )}
 
+            {activeTab === "TSS Money" && (
+              <div>
+                <h2 className="text-2xl font-bold uppercase tracking-tighter mb-6 text-[#2d2d2d]">TSS Money</h2>
+                <div className="bg-[#f0f0f0] border border-border p-6 text-center">
+                  <Coins className="w-12 h-12 mx-auto mb-4 text-teal-600" />
+                  <p className="text-sm uppercase tracking-widest mb-2 text-[#58595b]">Current Balance</p>
+                  <p className="text-4xl font-bold text-teal-600">₹ {(user?.tssMoney || 0).toFixed(2)}</p>
+                  <p className="text-sm mt-4 text-[#6c757d]">Use your TSS Money at checkout for instant discounts.</p>
+                </div>
+              </div>
+            )}
+
             {activeTab === "Profile" && (
               <div>
                 <h2 className="text-2xl font-bold uppercase tracking-tighter mb-6 text-[#2d2d2d]">Account Details</h2>

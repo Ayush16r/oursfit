@@ -70,7 +70,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
     { label: "Delivered", status: "Delivered", icon: Package },
   ];
 
-  const currentStepIndex = steps.findIndex(s => s.status.toLowerCase() === order.status?.toLowerCase() || s.status === 'Pending') || 0;
+  const currentStepIndex = Math.max(steps.findIndex(s => s.status.toLowerCase() === order.status?.toLowerCase()), 0);
 
   return (
     <div className="container mx-auto px-4 py-12 min-h-screen max-w-4xl bg-white">

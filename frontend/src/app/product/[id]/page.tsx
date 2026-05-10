@@ -181,7 +181,13 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
               
               <div className="flex flex-wrap gap-2">
                 {sizes.map((size: string) => {
-                  const isAvailable = (product.sizes || sizes).includes(size); // Assuming sizes array in DB means available
+                  let isAvailable = true;
+                  if (product.variants && product.variants.length > 0) {
+                    isAvailable = product.variants.some((v: any) => v.size === size && v.stock > 0);
+                  } else if (product.sizes && product.sizes.length > 0) {
+                    isAvailable = product.sizes.includes(size);
+                  }
+                  
                   return (
                     <button
                       key={size}
