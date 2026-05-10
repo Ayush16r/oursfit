@@ -33,6 +33,9 @@ const updateSettings = async (req, res) => {
     
     if (req.body.announcementText !== undefined) settings.announcementText = req.body.announcementText;
     if (req.body.announcementActive !== undefined) settings.announcementActive = req.body.announcementActive;
+    if (req.body.flashSaleName !== undefined) settings.flashSaleName = req.body.flashSaleName;
+    if (req.body.flashSaleEndTime !== undefined) settings.flashSaleEndTime = req.body.flashSaleEndTime;
+    if (req.body.campaignTitle !== undefined) settings.campaignTitle = req.body.campaignTitle;
 
     const updatedSettings = await settings.save();
     res.json(updatedSettings);

@@ -34,6 +34,8 @@ const getProductById = async (req, res) => {
 const createProduct = async (req, res) => {
   try {
     const productData = { ...req.body };
+    delete productData._id; // Prevent CastError if empty _id is passed
+    delete productData.__v;
     if (!productData.images || productData.images.length === 0) {
       productData.images = ['/images/sample.jpg'];
     }

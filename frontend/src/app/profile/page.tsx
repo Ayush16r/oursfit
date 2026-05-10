@@ -13,6 +13,7 @@ export default function ProfilePage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("Orders");
+  const [profileLoaded, setProfileLoaded] = useState(false);
 
   useEffect(() => {
     if (!user?.token) {
@@ -36,10 +37,26 @@ export default function ProfilePage() {
       }
     };
 
+    const fetchProfile = async () => {
+      try {
+        const config = { headers: { Authorization: `Bearer ${user.token}` } };
+        const { data } = await axios.get(`${API_URL}/auth/profile`, config);
+        setUser({ ...data, token: user.token });
+      } catch (error) {
+        console.error("Error fetching profile", error);
+      } finally {
+        setProfileLoaded(true);
+      }
+    };
+
+    if (!profileLoaded) {
+      fetchProfile();
+    }
+
     if (activeTab === "Orders") {
       fetchOrders();
     }
-  }, [user, router, activeTab]);
+  }, [user, router, activeTab, profileLoaded, setUser]);
 
   const handleLogout = () => {
     setUser(null);
@@ -87,14 +104,14 @@ export default function ProfilePage() {
               className={`text-left p-4 border-b border-border transition-colors flex items-center gap-2 ${activeTab === "TSS Points" ? "text-teal-600 font-bold bg-teal-50" : "text-[#58595b] hover:bg-muted/30"}`}
             >
               <span className="text-lg">TSS Points</span>
-              <span className="text-xs text-teal-600">(Active TSS Points: 0.00)</span>
+              <span className="text-xs text-teal-600">(Active TSS Points: {user?.tssPoints || 0})</span>
             </button>
             <button 
               onClick={() => setActiveTab("TSS Money")}
               className={`text-left p-4 border-b border-border transition-colors flex items-center gap-2 ${activeTab === "TSS Money" ? "text-teal-600 font-bold bg-teal-50" : "text-[#58595b] hover:bg-muted/30"}`}
             >
               <span className="text-lg">TSS Money</span>
-              <span className="text-xs text-teal-600">(TSS Money Balance: ₹ 0.00)</span>
+              <span className="text-xs text-teal-600">(TSS Money Balance: ₹ {user?.tssMoney?.toFixed(2) || '0.00'})</span>
             </button>
             <button 
               onClick={() => setActiveTab("FAQs")}

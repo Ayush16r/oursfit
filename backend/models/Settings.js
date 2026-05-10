@@ -33,6 +33,17 @@ const settingsSchema = new mongoose.Schema({
   announcementActive: {
     type: Boolean,
     default: true,
+  },
+  flashSaleName: {
+    type: String,
+    default: "",
+  },
+  flashSaleEndTime: {
+    type: Date,
+  },
+  campaignTitle: {
+    type: String,
+    default: "",
   }
 }, {
   timestamps: true,

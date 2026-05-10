@@ -28,24 +28,22 @@ export default function AdminMarketingPage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (activeModal === 'announcement') {
-      try {
-        setSaving(true);
-        const config = { headers: { Authorization: `Bearer ${user?.token}` } };
-        await axios.put(`${API_URL}/settings`, {
-          announcementText: settings.announcementText,
-          announcementActive: settings.announcementActive
-        }, config);
-        alert("Announcement banner updated successfully!");
-        setActiveModal(null);
-      } catch (error) {
-        alert("Failed to save settings");
-      } finally {
-        setSaving(false);
-      }
-    } else {
-      alert("Saved successfully! (Backend integration pending for this module)");
+    try {
+      setSaving(true);
+      const config = { headers: { Authorization: `Bearer ${user?.token}` } };
+      await axios.put(`${API_URL}/settings`, {
+        announcementText: settings.announcementText,
+        announcementActive: settings.announcementActive,
+        flashSaleName: settings.flashSaleName,
+        flashSaleEndTime: settings.flashSaleEndTime,
+        campaignTitle: settings.campaignTitle
+      }, config);
+      alert(`${activeModal === 'flash' ? 'Flash Sale' : activeModal === 'campaigns' ? 'Campaign' : 'Announcement'} settings saved successfully!`);
       setActiveModal(null);
+    } catch (error) {
+      alert("Failed to save settings");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -145,11 +143,22 @@ export default function AdminMarketingPage() {
                   <>
                     <div>
                       <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1 block">Flash Sale Name</label>
-                      <input type="text" defaultValue="Midnight Drop" className="w-full bg-background border border-border rounded-lg p-3 text-sm focus:ring-2 focus:ring-accent outline-none" />
+                      <input 
+                        type="text" 
+                        value={settings.flashSaleName || ""} 
+                        onChange={e => setSettings({...settings, flashSaleName: e.target.value})}
+                        className="w-full bg-background border border-border rounded-lg p-3 text-sm focus:ring-2 focus:ring-accent outline-none" 
+                        placeholder="Midnight Drop"
+                      />
                     </div>
                     <div>
                       <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1 block">End Date & Time</label>
-                      <input type="datetime-local" className="w-full bg-background border border-border rounded-lg p-3 text-sm focus:ring-2 focus:ring-accent outline-none" />
+                      <input 
+                        type="datetime-local" 
+                        value={settings.flashSaleEndTime ? new Date(settings.flashSaleEndTime).toISOString().slice(0, 16) : ""} 
+                        onChange={e => setSettings({...settings, flashSaleEndTime: e.target.value})}
+                        className="w-full bg-background border border-border rounded-lg p-3 text-sm focus:ring-2 focus:ring-accent outline-none" 
+                      />
                     </div>
                   </>
                 )}
@@ -158,7 +167,13 @@ export default function AdminMarketingPage() {
                   <div>
                     <p className="text-sm opacity-70 mb-4">You can feature specific products on the homepage by updating their "Featured" toggle in the Products menu.</p>
                     <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1 block">Campaign Title</label>
-                    <input type="text" defaultValue="Summer Essentials" className="w-full bg-background border border-border rounded-lg p-3 text-sm focus:ring-2 focus:ring-accent outline-none" />
+                    <input 
+                      type="text" 
+                      value={settings.campaignTitle || ""} 
+                      onChange={e => setSettings({...settings, campaignTitle: e.target.value})}
+                      className="w-full bg-background border border-border rounded-lg p-3 text-sm focus:ring-2 focus:ring-accent outline-none" 
+                      placeholder="Summer Essentials"
+                    />
                   </div>
                 )}
 
