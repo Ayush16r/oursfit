@@ -152,7 +152,7 @@ export default function CheckoutPage() {
         qty: item.quantity,
         image: item.image,
         price: item.price,
-        size: item.size,
+        size: item.size || "Standard",
         product: item.id.length === 24 ? item.id : "64a0f4b3e8e45a0b8c8d0a0b"
       }));
 
