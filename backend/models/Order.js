@@ -112,7 +112,12 @@ const orderSchema = new mongoose.Schema({
   },
   razorpaySignature: {
     type: String,
-  }
+  },
+  timeline: [{
+    status: { type: String },
+    date: { type: Date, default: Date.now },
+    description: { type: String }
+  }]
 }, {
   timestamps: true,
 });
