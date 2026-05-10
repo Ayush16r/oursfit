@@ -210,8 +210,20 @@ export default function ProfilePage() {
               </div>
             )}
 
+            {activeTab === "TSS Points" && (
+              <div>
+                <h2 className="text-2xl font-bold uppercase tracking-tighter mb-6 text-[#2d2d2d]">TSS Points</h2>
+                <div className="bg-[#f0f0f0] border border-border p-6 text-center">
+                  <Gift className="w-12 h-12 mx-auto mb-4 text-orange-500" />
+                  <p className="text-sm uppercase tracking-widest mb-2 text-[#58595b]">Active TSS Points</p>
+                  <p className="text-4xl font-bold text-orange-500">{user?.tssPoints || 0}</p>
+                  <p className="text-sm mt-4 text-[#6c757d]">Earn points on every purchase and redeem them for exclusive rewards.</p>
+                </div>
+              </div>
+            )}
+
             {/* Placeholders for other tabs */}
-            {["Gift Vouchers", "TSS Points", "TSS Money", "FAQs", "My Membership"].includes(activeTab) && (
+            {["Gift Vouchers", "FAQs", "My Membership"].includes(activeTab) && (
               <div className="py-20 text-center">
                 <h2 className="text-2xl font-bold text-[#2d3446] mb-4">{activeTab}</h2>
                 <p className="text-muted-foreground text-sm">You have no active {activeTab.toLowerCase()} at the moment.</p>

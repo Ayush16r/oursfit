@@ -59,8 +59,13 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
   }
 
   // Calculate expected delivery date (+ deliveryDays from createdAt)
-  const deliveryDate = new Date(order.createdAt);
-  deliveryDate.setDate(deliveryDate.getDate() + deliveryDays);
+  const deliveryDate = order.estimatedDelivery 
+    ? new Date(order.estimatedDelivery) 
+    : (() => {
+        const d = new Date(order.createdAt);
+        d.setDate(d.getDate() + deliveryDays);
+        return d;
+      })();
 
   const steps = [
     { label: "Order Placed", status: "Pending", icon: Clock },
@@ -70,7 +75,14 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
     { label: "Delivered", status: "Delivered", icon: Package },
   ];
 
-  const currentStepIndex = Math.max(steps.findIndex(s => s.status.toLowerCase() === order.status?.toLowerCase()), 0);
+  const getNormalizedStatus = (status: string) => {
+    if (!status) return 'pending';
+    const s = status.toLowerCase();
+    if (s === 'processing') return 'confirmed';
+    return s;
+  };
+
+  const currentStepIndex = Math.max(steps.findIndex(s => s.status.toLowerCase() === getNormalizedStatus(order.status)), 0);
 
   return (
     <div className="container mx-auto px-4 py-12 min-h-screen max-w-4xl bg-white">
