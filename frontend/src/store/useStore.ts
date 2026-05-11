@@ -4,7 +4,7 @@ import axios from 'axios';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://oursfit-backends.onrender.com/api';
 
-interface User {
+export interface User {
   _id: string;
   name: string;
   email: string;

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useStore } from "@/store/useStore";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { Package, User, LogOut, MapPin, Gift, HelpCircle, Shield, Trash2, CreditCard, Coins } from "lucide-react";
+import { Package, User as UserIcon, LogOut, MapPin, Gift, HelpCircle, Shield, Trash2, CreditCard, Coins } from "lucide-react";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://oursfit-backends.onrender.com/api';
 
 export default function ProfilePage() {
